@@ -19,13 +19,11 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              showButtomSheet(
-                  context: context,
-                  callback: (value) {
-                    print(value);
-                    notesList.add(value);
-                    setState(() {});
-                  });
+              addEditItemBottomSheet(callback: (value) {
+                print(value);
+                notesList.add(value);
+                setState(() {});
+              });
             },
           )
         ],
@@ -43,7 +41,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Expanded(child: Text(notesList[index])),
                       IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            addEditItemBottomSheet(
+                                initialValue: notesList[index],
+                                callback: (val) {
+                                  notesList[index] = val;
+                                  setState(() {});
+                                });
+                          },
                           icon: const Icon(
                             Icons.edit,
                             color: Colors.blueAccent,
@@ -70,12 +75,16 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {});
   }
 
-  void showButtomSheet({required BuildContext context, required Function(String) callback}) {
+  void addEditItemBottomSheet({String? initialValue, required Function(String) callback}) {
     TextEditingController noteController = TextEditingController();
+
+    if (initialValue != null) {
+      //ma3nahaa edit
+      noteController.text = initialValue;
+    }
 
     showModalBottomSheet(
         context: context,
-        // isScrollControlled: true,
         builder: (BuildContext context) {
           return Column(
             children: [
@@ -87,9 +96,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.of(context).pop();
                       },
                       child: const Text("Cancel")),
-                  const Expanded(
+                  Expanded(
                       child: Text(
-                    "add new note",
+                    initialValue != null ? "Edit note" : "Add new Note",
                     textAlign: TextAlign.center,
                   )),
                   TextButton(
@@ -104,7 +113,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(16),
                 child: TextField(
                   controller: noteController,
-                  decoration: const InputDecoration(hintText: "Enter New Note", border: OutlineInputBorder()),
+                  decoration: InputDecoration(
+                      hintText: initialValue != null ? "Edit Note" : "Add Note", border: const OutlineInputBorder()),
                 ),
               )
             ],
