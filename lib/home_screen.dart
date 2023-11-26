@@ -8,7 +8,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<String> notesList = ["testtesttesttesttesttest testtesttesttesttest testtesttesttest"];
+  List<String> notesList = [];
 
   @override
   Widget build(BuildContext context) {

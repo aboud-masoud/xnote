@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "408958016385",
+    "project_id": "xnote-41438",
+    "storage_bucket": "xnote-41438.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:408958016385:android:83cee56564208b20f76680",
+        "android_client_info": {
+          "package_name": "com.example.xtodo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFwDka6nkd9da1AyAoZqje5KsHvaRbMZ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
