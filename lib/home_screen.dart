@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -8,7 +9,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<String> notesList = [];
+  final CollectionReference _collection = FirebaseFirestore.instance.collection('todo');
+
+  // List<String> notesList = []; //Should be deleted
 
   @override
   Widget build(BuildContext context) {
@@ -19,60 +22,76 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              addEditItemBottomSheet(callback: (value) {
+              addEditItemBottomSheet(callback: (value) async {
                 print(value);
-                notesList.add(value);
-                setState(() {});
+
+                await _collection.add({"note": value});
+
+                //  notesList.add(value);
+                // setState(() {});
               });
             },
           )
         ],
       ),
-      body: ListView.builder(
-          itemCount: notesList.length,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                color: Colors.grey[200],
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Expanded(child: Text(notesList[index])),
-                      IconButton(
-                          onPressed: () {
-                            addEditItemBottomSheet(
-                                initialValue: notesList[index],
-                                callback: (val) {
-                                  notesList[index] = val;
-                                  setState(() {});
-                                });
-                          },
-                          icon: const Icon(
-                            Icons.edit,
-                            color: Colors.blueAccent,
-                          )),
-                      IconButton(
-                          onPressed: () {
-                            deleteItem(index: index);
-                          },
-                          icon: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ))
-                    ],
-                  ),
-                ),
-              ),
-            );
+      body: StreamBuilder(
+          stream: _collection.snapshots(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
+            if (streamSnapshot.hasData) {
+              return ListView.builder(
+                  itemCount: streamSnapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    final DocumentSnapshot documentSnapshot = streamSnapshot.data!.docs[index];
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        color: Colors.grey[200],
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Expanded(child: Text(documentSnapshot['note'])),
+                              IconButton(
+                                  onPressed: () {
+                                    addEditItemBottomSheet(
+                                        initialValue: documentSnapshot['note'],
+                                        callback: (val) {
+                                          //TODO
+                                          // notesList[index] = val;
+                                          // setState(() {});
+                                        });
+                                  },
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    color: Colors.blueAccent,
+                                  )),
+                              IconButton(
+                                  onPressed: () {
+                                    deleteItem(index: index);
+                                  },
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ))
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  });
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
           }),
     );
   }
 
   void deleteItem({required int index}) {
-    notesList.removeAt(index);
-    setState(() {});
+    //TODO
+    // notesList.removeAt(index);
+    // setState(() {});
   }
 
   void addEditItemBottomSheet({String? initialValue, required Function(String) callback}) {
