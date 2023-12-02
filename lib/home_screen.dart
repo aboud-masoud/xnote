@@ -11,8 +11,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final CollectionReference _collection = FirebaseFirestore.instance.collection('todo');
 
-  // List<String> notesList = []; //Should be deleted
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,10 +53,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   onPressed: () {
                                     addEditItemBottomSheet(
                                         initialValue: documentSnapshot['note'],
-                                        callback: (val) {
-                                          //TODO
-                                          // notesList[index] = val;
-                                          // setState(() {});
+                                        callback: (val) async {
+                                          await _collection.doc(documentSnapshot.id).update({"note": val});
                                         });
                                   },
                                   icon: const Icon(
@@ -66,9 +62,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: Colors.blueAccent,
                                   )),
                               IconButton(
-                                  onPressed: () {
-                                    deleteItem(index: index);
-                                  },
+                                  onPressed: () => deleteItem(documnetId: documentSnapshot.id),
+                                  // onPressed: () {
+                                  //   deleteItem(documnetId: documentSnapshot.id);
+                                  // },
                                   icon: const Icon(
                                     Icons.delete,
                                     color: Colors.red,
@@ -88,10 +85,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void deleteItem({required int index}) {
-    //TODO
-    // notesList.removeAt(index);
-    // setState(() {});
+  void deleteItem({required String documnetId}) {
+    _collection.doc(documnetId).delete();
   }
 
   void addEditItemBottomSheet({String? initialValue, required Function(String) callback}) {
@@ -122,7 +117,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   )),
                   TextButton(
                       onPressed: () {
-                        callback(noteController.text);
+                        if (noteController.text.isEmpty == false) {
+                          callback(noteController.text);
+                        }
                         Navigator.of(context).pop();
                       },
                       child: const Text("Save")),
