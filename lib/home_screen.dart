@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
               addEditItemBottomSheet(callback: (value) async {
                 print(value);
 
-                await _collection.add({"note": value});
+                await _collection.add({"note": value, "date": DateTime.now().toString()});
 
                 //  notesList.add(value);
                 // setState(() {});
@@ -36,8 +36,9 @@ class _HomeScreenState extends State<HomeScreen> {
           stream: _collection.snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
             if (streamSnapshot.hasData) {
+              final sortedData = sortList(streamSnapshot.data!.docs);
               return ListView.builder(
-                  itemCount: streamSnapshot.data!.docs.length,
+                  itemCount: sortedData.length,
                   itemBuilder: (context, index) {
                     final DocumentSnapshot documentSnapshot = streamSnapshot.data!.docs[index];
                     return Padding(
@@ -54,7 +55,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     addEditItemBottomSheet(
                                         initialValue: documentSnapshot['note'],
                                         callback: (val) async {
-                                          await _collection.doc(documentSnapshot.id).update({"note": val});
+                                          await _collection
+                                              .doc(documentSnapshot.id)
+                                              .update({"note": val, "date": DateTime.now().toString()});
                                         });
                                   },
                                   icon: const Icon(
@@ -83,6 +86,20 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           }),
     );
+  }
+
+  List<QueryDocumentSnapshot<Object?>> sortList(List<QueryDocumentSnapshot<Object?>> list) {
+    for (var i = 0; i < list.length; i++) {
+      String date1 = list[i]["date"];
+      DateTime date1Time = DateTime.parse(date1);
+      print(date1Time);
+
+      for (var j = 0; j < list.length; j++) {}
+    }
+
+    //TODO: HW
+
+    return list;
   }
 
   void deleteItem({required String documnetId}) {
